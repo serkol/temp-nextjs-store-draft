@@ -1627,16 +1627,18 @@ git commit -m "first commit"
 - deploy on vercel
 - setup env variables
 
-### Toast Component
+### Toast Component (sonner)
 
-[Toast](https://ui.shadcn.com/docs/components/toast)
+SK: components/toaster was replaced by components/sonner
+
+[Soaner](https://ui.shadcn.com/docs/components/sonner)
 
 providers.tsx
 
 ```tsx
 "use client";
 import { ThemeProvider } from "./theme-provider";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/components/ui/sonner";
 
 function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -1658,6 +1660,8 @@ export default Providers;
 
 ### Clerk
 
+SK: using new version
+
 [Clerk Docs](https://clerk.com/)
 [Clerk + Next.js Setup](https://clerk.com/docs/quickstarts/nextjs)
 
@@ -1667,11 +1671,11 @@ export default Providers;
 npm install @clerk/nextjs
 ```
 
-- create .env.local
+- SK(new version): Add these keys to your .env
 
 ```bash
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
-CLERK_SECRET_KEY=
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_Y29udGVudC1nb3NoYXdrLTExLmNsZXJrLmFjY291bnRzLmRldiQ
+CLERK_SECRET_KEY=sk_test_AhM107KKPX4BWotNs5w2TGvOS5rT5ZdizO3LTk9tC3
 ```
 
 In Next.js, environment variables that start with NEXT*PUBLIC* are exposed to the browser. This means they can be accessed in your front-end code.
@@ -1699,15 +1703,22 @@ return (
 );
 ```
 
-- create middleware.ts
+SK: in new version:
+
+- proxy.ts replaces middleware.ts
+- clerkMiddleware callback is async, so call "await auth.protect();"
+
+- SK: Create file proxy.ts
 
 ```ts
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 const isPublicRoute = createRouteMatcher(["/", "/products(.*)", "/about"]);
 
-export default clerkMiddleware((auth, req) => {
-  if (!isPublicRoute(req)) auth().protect();
+export default clerkMiddleware(async (auth, req) => {
+  if (!isPublicRoute(req)) {
+    await auth.protect();
+  }
 });
 
 export const config = {
